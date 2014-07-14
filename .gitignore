@@ -1,0 +1,16 @@
+.DS_Store
+.svn
+.settings
+.mymetadata
+.myumldata
+.idea
+.sass-cache
+CVS
+bin
+logs
+src/main/webapp/WEB-INF/classes
+src/main/webapp/WEB-INF/lib
+target
+# OS generated files #
+######################
+.DS_Store?
