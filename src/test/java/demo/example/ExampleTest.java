@@ -11,4 +11,10 @@ public class ExampleTest extends TestCase {
         int a2 = 50;
         assertEquals(70, example.add(a1, a2));
     }
+    public void testSub() throws Exception {
+        Example example = new Example();
+        int a1 = 20;
+        int a2 = 50;
+        assertEquals(-30, example.sub(a1, a2));
+    }
 }
