@@ -8,12 +8,27 @@ import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.PlainTextByLineStream;
 
 import java.io.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
  * Created by yangxu on 2014/8/18.
  */
-public class TrainThread extends Thread {
+public class TrainThread {
+    private static Map<String, String> nameMap = new HashMap();
+
+    public TrainThread() {
+        nameMap.put("sample_0.1_1.txt", "愤怒");
+        nameMap.put("sample_0.1_2.txt", "厌恶");
+        nameMap.put("sample_0.1_3.txt", "高兴");
+        nameMap.put("sample_0.1_4.txt", "低落");
+    }
+
 
     public void Sentimented() {
 
@@ -43,14 +58,14 @@ public class TrainThread extends Thread {
 
     }
 
-    public void Covert(File rawWiboFolder,File outputFile,String catary){
+    public void Covert(File rawWiboFolder, File outputFile, String catary) {
 
         try {
             FileReader fin = new FileReader(rawWiboFolder);
             BufferedReader reader = new BufferedReader(fin);
-            FileWriter fout = new FileWriter(outputFile,true);
+            FileWriter fout = new FileWriter(outputFile, true);
             BufferedWriter writer = new BufferedWriter(fout);
-           // PrintWriter pw = new PrintWriter(fout);
+            // PrintWriter pw = new PrintWriter(fout);
 
            /*int c=0;
             while((c=reader.read())!=-1){
@@ -59,23 +74,54 @@ public class TrainThread extends Thread {
 
                 //Character[]arrary=s.split();
             }*/
-            String s=null;
-            while((s=reader.readLine())!=null){
-                char[]cArry=s.toCharArray();
+            String s = null;
+            while ((s = reader.readLine()) != null) {
+                char[] cArry = s.toCharArray();
                 writer.write(catary);
-                for(int i=0;i<cArry.length;i++){
-                    char c=cArry[i];
-                    String sappend=c+"";
-                   writer.write(" "+new String(sappend.getBytes("UTF-8"),"GBK"));
+                for (int i = 0; i < cArry.length; i++) {
+                    char c = cArry[i];
+                    String sappend = c + "";
+                    writer.write(" " + new String(sappend.getBytes("UTF-8"), "GBK"));
                 }
                 writer.newLine();
             }
             writer.close();
             reader.close();
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    public void convertDataSet(Path dataFolderPath, Path destinationFilePath) throws Exception {
+        BufferedWriter bw = Files.newBufferedWriter(destinationFilePath);
+        int[] idx = {0};
+        try (DirectoryStream<Path> ds = Files.newDirectoryStream(dataFolderPath, "{sample_0.1*}")) {
+            for (Path path : ds) {
+                System.out.println(path.toAbsolutePath().getFileName());
+                Files.lines(path).forEach(line -> {
+                    try {
+                        bw.write(nameMap.get(path.toAbsolutePath().getFileName().toString()));
+                        bw.write(" ");
+                        StringBuffer tmp = new StringBuffer(line.length() * 2);
+                        Arrays.asList(line.split("")).stream().forEach(x -> tmp.append(x).append(" "));
+                        bw.write(tmp.toString());
+                        bw.newLine();
+                        if (idx[0]++ % 1000 == 0) bw.flush();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        bw.flush();
+        bw.close();
+    }
+
 
     public static void main(String[] args) {
         TrainThread trainThread = new TrainThread();
@@ -85,10 +131,10 @@ public class TrainThread extends Thread {
         File f4 = new File("sample_0.1_4.txt");
         File f5 = new File("sampleOut.txt");
 
-        trainThread.Covert(f1,f5,"愤怒");
-        trainThread.Covert(f1,f5,"厌恶");
-        trainThread.Covert(f1,f5,"高兴");
-        trainThread.Covert(f1,f5,"低落");
+        trainThread.Covert(f1, f5, "愤怒");
+        trainThread.Covert(f1, f5, "厌恶");
+        trainThread.Covert(f1, f5, "高兴");
+        trainThread.Covert(f1, f5, "低落");
        /* try {
             //trainThread.Sentiment();
             trainThread.Sentimented();
