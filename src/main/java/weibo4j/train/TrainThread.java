@@ -92,6 +92,43 @@ public class TrainThread {
         }
     }
 
+    /**
+     * 模型训练
+     *
+     * @param trainFilePath 训练语料的path
+     * @param modelPath     训练后模型的存放位置
+     */
+    public void trainModel(Path trainFilePath, Path modelPath) {
+        OutputStream modelOut = null;
+        try {
+            ObjectStream<String> lineStream = new PlainTextByLineStream(Files.newInputStream(trainFilePath), "UTF-8");
+            ObjectStream<DocumentSample> sampleStream = new DocumentSampleStream(lineStream);
+            DoccatModel model = DocumentCategorizerME.train("en", sampleStream);
+            modelOut = Files.newOutputStream(modelPath);
+            model.serialize(modelOut);
+        } catch (IOException e) {
+            // Failed to save modela
+            e.printStackTrace();
+        } finally {
+            if (modelOut != null) {
+                try {
+                    modelOut.close();
+                } catch (IOException e) {
+                    // Failed to correctly save model.
+                    // Written model might be invalid.
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 产生最大熵模型需要的语料
+     *
+     * @param dataFolderPath      原始语料的文件夹
+     * @param destinationFilePath 产生的语料的地址
+     * @throws Exception
+     */
     public void convertDataSet(Path dataFolderPath, Path destinationFilePath) throws Exception {
         BufferedWriter bw = Files.newBufferedWriter(destinationFilePath);
         int[] idx = {0};

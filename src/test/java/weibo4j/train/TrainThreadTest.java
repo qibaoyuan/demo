@@ -33,4 +33,11 @@ public class TrainThreadTest extends TestCase {
     public void testMain() throws Exception {
 
     }
+
+    public void testTrainModel() {
+        Path destinationFilePath = Paths.get("/Users/qibaoyuan/Documents/sina_tweets_sentiment_category_sample/sample.txt");
+        Path outModelPath = Paths.get("/Users/qibaoyuan/Documents/sina_tweets_sentiment_category_sample/model.out");
+        TrainThread trainThread = new TrainThread();
+        trainThread.trainModel(destinationFilePath, outModelPath);
+    }
 }
