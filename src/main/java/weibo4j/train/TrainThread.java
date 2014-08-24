@@ -123,6 +123,27 @@ public class TrainThread {
     }
 
     /**
+     * 找出句子的分类
+     *
+     * @param text  需要分类的句子
+     * @param modelPath  训练模型的存放位置
+     * @return 分类
+     */
+    public String outputClassificationResult(String text,Path modelPath){
+        String category="";
+        try {
+            InputStream is = Files.newInputStream(modelPath);
+            DoccatModel m = new DoccatModel(is);
+            String inputText =text;
+            DocumentCategorizerME myCategorizer = new DocumentCategorizerME(m);
+            double[] outcomes = myCategorizer.categorize(inputText);
+            category = myCategorizer.getBestCategory(outcomes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return category;
+    }
+    /**
      * 产生最大熵模型需要的语料
      *
      * @param dataFolderPath      原始语料的文件夹
@@ -160,7 +181,7 @@ public class TrainThread {
     }
 
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         TrainThread trainThread = new TrainThread();
         File f1 = new File("sample_0.1_1.txt");
         File f2 = new File("sample_0.1_2.txt");
@@ -172,12 +193,12 @@ public class TrainThread {
         trainThread.Covert(f1, f5, "厌恶");
         trainThread.Covert(f1, f5, "高兴");
         trainThread.Covert(f1, f5, "低落");
-       /* try {
+       *//* try {
             //trainThread.Sentiment();
             trainThread.Sentimented();
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }*//*
 
-    }
+    }*/
 }
