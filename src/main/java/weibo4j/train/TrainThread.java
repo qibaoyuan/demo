@@ -125,16 +125,18 @@ public class TrainThread {
     /**
      * 找出句子的分类
      *
-     * @param text  需要分类的句子
-     * @param modelPath  训练模型的存放位置
+     * @param text      需要分类的句子
+     * @param modelPath 训练模型的存放位置
      * @return 分类
      */
-    public String outputClassificationResult(String text,Path modelPath){
-        String category="";
+    public String outputClassificationResult(String text, Path modelPath) {
+        String category = "";
         try {
             InputStream is = Files.newInputStream(modelPath);
             DoccatModel m = new DoccatModel(is);
-            String inputText =text;
+            StringBuffer temp = new StringBuffer(text.length() * 2);
+            Arrays.asList(text.split("")).stream().forEach(x -> temp.append(x).append(" "));
+            String inputText = temp.toString();
             DocumentCategorizerME myCategorizer = new DocumentCategorizerME(m);
             double[] outcomes = myCategorizer.categorize(inputText);
             category = myCategorizer.getBestCategory(outcomes);
@@ -143,6 +145,7 @@ public class TrainThread {
         }
         return category;
     }
+
     /**
      * 产生最大熵模型需要的语料
      *
